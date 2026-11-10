@@ -122,6 +122,18 @@
   details.table-toggle th, details.table-toggle td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
   details.table-toggle td:last-child, details.table-toggle th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
 
+  .compare-wrap { overflow-x: auto; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+  .compare-table th, .compare-table td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .compare-table th:first-child, .compare-table td:first-child { text-align: left; }
+  .compare-table thead th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); font-weight: 700; }
+  .compare-table thead th .cdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+  .compare-table tbody td { font-variant-numeric: tabular-nums; }
+  .compare-table tbody td:not(:first-child) { color: var(--ink-soft); }
+  .compare-table tbody td.ctotal { font-weight: 700; color: var(--ink); }
+  .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-table tbody td.czero { color: var(--ink-faint); opacity: 0.5; }
+
   footer { font-size: 13px; color: var(--ink-faint); margin-top: 32px; line-height: 1.6; }
   footer a { color: var(--accent); }
 
@@ -529,49 +541,60 @@ const BRANCH_INFO = {
   "PEDRO LUIS": {city:"Caracas", addr:"Subida de Los Naranjos, Distrito Capital"},
 };
 
-function renderBranches(fs){
-  const d = DATA[active];
-  const el = document.getElementById("branches");
-  const top = computeBranches(active, fs.dateFrom, fs.dateTo);
-  if(top.length===0){ el.innerHTML = '<p style="color:var(--ink-faint); font-size:14px;">Sin datos en este rango.</p>'; return; }
-  const max = Math.max(...top.map(b=>b[1]));
-  el.innerHTML = "";
-  top.forEach(([name,v])=>{
-    const info = BRANCH_INFO[name];
-    const w = max ? (v/max*100) : 0;
-    const row = document.createElement("div");
-    row.className = "bar-row";
-    const display = info ? `${name} (${info.city})` : name;
-    row.innerHTML = `<div class="name">${display}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${w}%; background:var(${d.dot})"></div></div>
-      <div class="num">${fmt(v)}</div>`;
-    const fill = row.querySelector(".bar-fill");
-    const tip = info ? `${name} — ${info.city}: ${info.addr} (${fmt(v)} casos)` : `${name}: ${fmt(v)}`;
-    fill.addEventListener("mousemove", e=>showTip(e, tip));
-    fill.addEventListener("mouseleave", hideTip);
-    el.appendChild(row);
+function mergeByCategory(cube, dateFrom, dateTo){
+  const merged = {};
+  ORDER.forEach(key=>{
+    const catCube = cube[key];
+    dateRange(dateFrom, dateTo).forEach(dt=>{
+      const obj = catCube[dt];
+      if(!obj) return;
+      Object.keys(obj).forEach(name=>{
+        if(!merged[name]) merged[name] = {completadas:0, cancel_customer:0, falta_asignacion:0, cancel_admin:0};
+        merged[name][key] += obj[name];
+      });
+    });
   });
-  const details = document.createElement("details");
-  details.className = "table-toggle";
-  const rows = top.map(([name,v])=>{
-    const info = BRANCH_INFO[name];
-    const sub = info ? `<div style="color:var(--ink-faint); font-size:12px; font-weight:400;">${info.city} — ${info.addr}</div>` : "";
-    return `<tr><td>${name}${sub}</td><td>${fmt(v)}</td></tr>`;
+  const rows = Object.entries(merged).map(([name,counts])=>{
+    const total = ORDER.reduce((s,k)=>s+counts[k],0);
+    return {name, counts, total};
+  });
+  rows.sort((a,b)=>b.total-a.total);
+  return rows.slice(0,10);
+}
+
+function compareTableHTML(rows, nameHeader, nameFmt){
+  const head = ORDER.map(k=>{
+    const d = DATA[k];
+    return `<th><span class="cdot" style="background:var(${d.dot})"></span>${d.label}</th>`;
   }).join("");
-  details.innerHTML = `<summary>Ver como tabla (con dirección)</summary>
-    <table><thead><tr><th>Sede</th><th>Casos</th></tr></thead><tbody>${rows}</tbody></table>`;
-  el.appendChild(details);
+  const body = rows.map(r=>{
+    const cells = ORDER.map(k=>{
+      const v = r.counts[k];
+      return `<td class="${v===0?'czero':''}">${fmt(v)}</td>`;
+    }).join("");
+    return `<tr><td>${nameFmt(r.name)}</td>${cells}<td class="ctotal">${fmt(r.total)}</td></tr>`;
+  }).join("");
+  return `<div class="compare-wrap"><table class="compare-table">
+    <thead><tr><th>${nameHeader}</th>${head}<th>Total</th></tr></thead>
+    <tbody>${body}</tbody>
+  </table></div>`;
+}
+
+function renderBranches(fs){
+  const el = document.getElementById("branches");
+  const rows = mergeByCategory(BRANCH_DATE_CUBE, fs.dateFrom, fs.dateTo);
+  if(rows.length===0){ el.innerHTML = '<p style="color:var(--ink-faint); font-size:14px;">Sin datos en este rango.</p>'; return; }
+  el.innerHTML = compareTableHTML(rows, "Sede", name=>{
+    const info = BRANCH_INFO[name];
+    return info ? `${name} <span style="color:var(--ink-faint); font-weight:400;">(${info.city})</span>` : name;
+  });
 }
 
 function renderCities(fs){
-  const d = DATA[active];
   const el = document.getElementById("cities");
-  const top = computeCities(active, fs.dateFrom, fs.dateTo);
-  if(top.length===0){ el.innerHTML = '<p style="color:var(--ink-faint); font-size:14px;">Sin datos en este rango.</p>'; return; }
-  const labels = top.map(c=>c[0]);
-  const values = top.map(c=>c[1]);
-  barRows(el, labels, values, d.dot);
-  addTable(el, labels, values, "Ciudad", "Casos");
+  const rows = mergeByCategory(CITY_DATE_CUBE, fs.dateFrom, fs.dateTo);
+  if(rows.length===0){ el.innerHTML = '<p style="color:var(--ink-faint); font-size:14px;">Sin datos en este rango.</p>'; return; }
+  el.innerHTML = compareTableHTML(rows, "Ciudad", name=>name);
 }
 
 function addTable(container, labels, values, colA, colB){
