@@ -133,6 +133,7 @@
   .compare-table tbody td.ctotal { font-weight: 700; color: var(--ink); }
   .compare-table tbody tr:last-child td { border-bottom: none; }
   .compare-table tbody td.czero { color: var(--ink-faint); opacity: 0.5; }
+  .compare-table .cpct { font-size: 11.5px; color: var(--ink-faint); font-weight: 400; }
 
   footer { font-size: 13px; color: var(--ink-faint); margin-top: 32px; line-height: 1.6; }
   footer a { color: var(--accent); }
@@ -578,7 +579,8 @@ function compareTableHTML(rows, nameHeader, nameFmt){
   const body = rows.map(r=>{
     const cells = ORDER.map(k=>{
       const v = r.counts[k];
-      return `<td class="${v===0?'czero':''}">${fmt(v)}</td>`;
+      const pct = r.total ? (v/r.total*100).toFixed(1).replace(".",",") : "0,0";
+      return `<td class="${v===0?'czero':''}">${fmt(v)} <span class="cpct">(${pct}%)</span></td>`;
     }).join("");
     return `<tr><td>${nameFmt(r.name)}</td>${cells}<td class="ctotal">${fmt(r.total)}</td></tr>`;
   }).join("");
