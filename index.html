@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Farmatodo · Panorama de viajes</title>
+<style>
+  :root {
+    --paper: #faf7f2;
+    --paper-raised: #ffffff;
+    --ink: #1e2430;
+    --ink-soft: #5b6472;
+    --ink-faint: #8b93a0;
+    --accent: #3a5a8c;
+    --accent-soft: #e8edf5;
+    --line: #e4dfd6;
+    --shadow: 0 4px 24px rgba(30, 36, 48, 0.08);
+
+    --cat-completadas: #2a78d6;
+    --cat-falta:       #eb6834;
+    --cat-cliente:     #1baf7a;
+    --cat-admin:       #eda100;
+    --cat-completadas-soft: #e7f0fc;
+    --cat-falta-soft:       #fce9e0;
+    --cat-cliente-soft:     #e2f5ed;
+    --cat-admin-soft:       #fcefd9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #14181f; --paper-raised: #1b212a; --ink: #edeef0; --ink-soft: #9ba3af; --ink-faint: #6b7280;
+      --accent: #7c9fd6; --accent-soft: #1e2a3d;
+      --line: #2a3038; --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      --cat-completadas: #3987e5; --cat-falta: #d95926; --cat-cliente: #199e70; --cat-admin: #c98500;
+      --cat-completadas-soft: #1b2733; --cat-falta-soft: #2c2019; --cat-cliente-soft: #16271f; --cat-admin-soft: #2b2110;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14181f; --paper-raised: #1b212a; --ink: #edeef0; --ink-soft: #9ba3af; --ink-faint: #6b7280;
+    --accent: #7c9fd6; --accent-soft: #1e2a3d;
+    --line: #2a3038; --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --cat-completadas: #3987e5; --cat-falta: #d95926; --cat-cliente: #199e70; --cat-admin: #c98500;
+    --cat-completadas-soft: #1b2733; --cat-falta-soft: #2c2019; --cat-cliente-soft: #16271f; --cat-admin-soft: #2b2110;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { padding: 48px 20px 72px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .kicker { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin: 0 0 10px; }
+  h1 { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif; font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
+  .subtitle { font-size: 16px; color: var(--ink-soft); margin: 0 0 36px; max-width: 68ch; line-height: 1.5; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 18px 20px; cursor: pointer; text-align: left; font: inherit; color: inherit; position: relative; overflow: hidden; transition: transform .15s ease; }
+  .card:hover { transform: translateY(-2px); }
+  .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--dot); }
+  .card.active { outline: 2px solid var(--dot); outline-offset: -2px; }
+  .card .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); margin-right: 7px; }
+  .card .label { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+  .card .value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+  .card .pct { font-size: 13px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+  .panel { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 24px 26px 20px; margin-bottom: 20px; }
+  .panel h2 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin: 0 0 18px; display: flex; align-items: center; gap: 8px; }
+  .panel h2 .swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--dot); }
+
+  .bar-row { display: grid; grid-template-columns: 112px 1fr 64px; align-items: center; gap: 12px; padding: 7px 0; font-size: 14px; }
+  .bar-row .name { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { background: var(--accent-soft); border-radius: 6px; height: 18px; position: relative; overflow: hidden; }
+  .bar-fill { background: var(--dot); height: 100%; border-radius: 6px; transition: width .4s ease; position: relative; }
+  .bar-row .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; font-size: 13px; }
+
+  .tooltip { position: fixed; pointer-events: none; background: var(--ink); color: var(--paper); font-size: 12px; padding: 6px 10px; border-radius: 6px; opacity: 0; transition: opacity .1s; z-index: 10; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .tooltip.show { opacity: 1; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .finding { background: var(--cat-falta-soft); border: 1px solid color-mix(in srgb, var(--cat-falta) 35%, var(--line)); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; font-size: 14px; line-height: 1.55; }
+  .finding strong { color: var(--cat-falta); }
+
+  details.table-toggle { margin-top: 8px; }
+  details.table-toggle summary { cursor: pointer; font-size: 12px; color: var(--accent); font-weight: 600; list-style: none; }
+  details.table-toggle summary::-webkit-details-marker { display: none; }
+  details.table-toggle table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  details.table-toggle th, details.table-toggle td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  details.table-toggle td:last-child, details.table-toggle th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+  footer { font-size: 13px; color: var(--ink-faint); margin-top: 32px; line-height: 1.6; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">Rides B2B · Farmatodo</p>
+  <h1>Panorama de viajes</h1>
+  <p class="subtitle">11 de septiembre – 10 de noviembre de 2026. 86.388 solicitudes de viaje en total, desglosadas por resultado. Clic en una tarjeta para ver el detalle de esa categoría.</p>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="finding" id="finding"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2><span class="swatch"></span>Por franja horaria</h2>
+      <div id="dayparts"></div>
+    </div>
+    <div class="panel">
+      <h2><span class="swatch"></span>Por día de la semana</h2>
+      <div id="weekday"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="swatch"></span>Top sedes (Caracas)</h2>
+    <div id="branches"></div>
+  </div>
+
+  <footer>
+    Datos: exportaciones de Rides B2B, 11 sept – 10 nov 2026. "Falta de asignación" = cancelación automática por no conseguir conductor (~5 min). "Cancelado por cliente" = el usuario cancela la solicitud. "Cancelado por admin" = cancelación manual desde soporte/operaciones. Reporte armado por Andrés Molea (LiveOps Support).
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const DATA = {
+  completadas:     {label:"Completadas",            dot:"--cat-completadas", soft:"--cat-completadas-soft",
+    total:36966, dayparts:[61,4826,13705,18374], weekday:[4981,4558,4549,4009,5694,6387,6788],
+    branches:[["PIEDRA LUNA",5176],["PASEO CARONI",2563],["VILLA GRANADA",1660],["ORO",1509],["MATERNIDAD",1489],["JOSE MIGUEL",1259],["NUEVA CARACAS",1136],["ZONA FRANCA",1113]],
+    tt_median:1680, note:"Mediana de 28 min desde que se crea el viaje hasta que termina."},
+  cancel_customer: {label:"Cancelado por cliente",  dot:"--cat-cliente", soft:"--cat-cliente-soft",
+    total:32656, dayparts:[290,6398,12468,13500], weekday:[5050,3475,4047,3855,4991,5935,5303],
+    branches:[["TEPUY",922],["JADE",893],["NUEVA CARACAS",867],["PEDRO LUIS",861],["JOSE MIGUEL",855],["TEREPAIMA",749],["YADIRA",707],["ARCO",673]],
+    tt_median:102, note:"Mediana de solo 1m 42s antes de cancelar: casi siempre es al momento de pedir el viaje."},
+  falta_asignacion:{label:"Falta de asignación",    dot:"--cat-falta", soft:"--cat-falta-soft",
+    total:16534, dayparts:[303,3261,5742,7228], weekday:[2473,1684,2045,1800,2520,3064,2948],
+    branches:[["JOSE MIGUEL",1184],["MATERNIDAD",495],["MONICA",446],["JUAN BAUTISTA",445],["TEREPAIMA",439],["NUEVA CARACAS",430],["PEDRO LUIS",430],["TEPUY",429]],
+    tt_median:289, note:"Prácticamente todos cancelan entre 4m49s y 5m02s: es el timeout automático por no conseguir conductor."},
+  cancel_admin:    {label:"Cancelado por admin",     dot:"--cat-admin", soft:"--cat-admin-soft",
+    total:232, dayparts:[1,37,73,121], weekday:[29,26,27,24,44,46,36],
+    branches:[["PIEDRA LUNA",19],["JOSE MIGUEL",12],["GRANATE",12],["VILLA GRANADA",10],["PASEO CARONI",8],["ORO",7],["MATERNIDAD",7],["ZONA FRANCA",7]],
+    tt_median:3437, note:"Mediana de 57 min antes de la cancelación manual: son casos atendidos uno por uno por soporte."},
+};
+
+const ORDER = ["completadas","cancel_customer","falta_asignacion","cancel_admin"];
+const DAYPART_LABELS = ["Madrugada (00-05h)","Mañana (06-11h)","Tarde (12-17h)","Noche (18-23h)"];
+const WEEKDAY_LABELS = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+
+const TOTAL = ORDER.reduce((s,k)=>s+DATA[k].total,0);
+let active = "completadas";
+
+function fmt(n){ return n.toLocaleString("es-VE"); }
+
+function renderCards(){
+  const el = document.getElementById("cards");
+  el.innerHTML = "";
+  ORDER.forEach(key=>{
+    const d = DATA[key];
+    const pct = (d.total/TOTAL*100).toFixed(1).replace(".",",");
+    const btn = document.createElement("button");
+    btn.className = "card" + (key===active ? " active" : "");
+    btn.style.setProperty("--dot", `var(${d.dot})`);
+    btn.innerHTML = `<div class="label"><span class="dot"></span>${d.label}</div>
+      <div class="value">${fmt(d.total)}</div>
+      <div class="pct">${pct}% del total</div>`;
+    btn.onclick = ()=>{ active = key; renderAll(); };
+    el.appendChild(btn);
+  });
+}
+
+function barRows(container, labels, values, dotVar, maxOverride){
+  const max = maxOverride || Math.max(...values);
+  container.innerHTML = "";
+  labels.forEach((lab,i)=>{
+    const v = values[i];
+    const w = max ? (v/max*100) : 0;
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `<div class="name">${lab}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%; background:var(${dotVar})"></div></div>
+      <div class="num">${fmt(v)}</div>`;
+    const fill = row.querySelector(".bar-fill");
+    fill.addEventListener("mousemove", e=>showTip(e, `${lab}: ${fmt(v)}`));
+    fill.addEventListener("mouseleave", hideTip);
+    container.appendChild(row);
+  });
+}
+
+function showTip(e, text){
+  const tip = document.getElementById("tooltip");
+  tip.textContent = text;
+  tip.style.left = (e.clientX+12)+"px";
+  tip.style.top = (e.clientY+12)+"px";
+  tip.classList.add("show");
+}
+function hideTip(){ document.getElementById("tooltip").classList.remove("show"); }
+
+function renderFinding(){
+  const d = DATA[active];
+  const el = document.getElementById("finding");
+  el.style.background = `var(${d.soft})`;
+  el.innerHTML = `<strong>${d.label}:</strong> ${d.note}`;
+}
+
+function renderDayparts(){
+  const d = DATA[active];
+  const el = document.getElementById("dayparts");
+  barRows(el, DAYPART_LABELS, d.dayparts, d.dot);
+  addTable(el, DAYPART_LABELS, d.dayparts, "Franja", "Casos");
+}
+function renderWeekday(){
+  const d = DATA[active];
+  const el = document.getElementById("weekday");
+  barRows(el, WEEKDAY_LABELS, d.weekday, d.dot);
+  addTable(el, WEEKDAY_LABELS, d.weekday, "Día", "Casos");
+}
+function renderBranches(){
+  const d = DATA[active];
+  const el = document.getElementById("branches");
+  const labels = d.branches.map(b=>b[0]);
+  const values = d.branches.map(b=>b[1]);
+  barRows(el, labels, values, d.dot);
+  addTable(el, labels, values, "Sede", "Casos");
+}
+
+function addTable(container, labels, values, colA, colB){
+  const details = document.createElement("details");
+  details.className = "table-toggle";
+  const rows = labels.map((l,i)=>`<tr><td>${l}</td><td>${fmt(values[i])}</td></tr>`).join("");
+  details.innerHTML = `<summary>Ver como tabla</summary>
+    <table><thead><tr><th>${colA}</th><th>${colB}</th></tr></thead><tbody>${rows}</tbody></table>`;
+  container.appendChild(details);
+}
+
+function renderAll(){
+  renderCards();
+  renderFinding();
+  renderDayparts();
+  renderWeekday();
+  renderBranches();
+}
+renderAll();
+</script>
+</body>
+</html>
