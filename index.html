@@ -125,6 +125,35 @@
   .brand-mark { color: var(--brand-blue); flex-shrink: 0; }
   .brand-mark svg { display: block; height: 28px; width: auto; }
   .brand-divider { width: 1px; height: 28px; background: var(--line); }
+
+  .tab-bar { display: flex; gap: 6px; margin-bottom: 26px; border-bottom: 1px solid var(--line); }
+  .tab-btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--ink-faint); background: none; border: none; cursor: pointer; padding: 10px 4px 12px; margin-right: 22px; border-bottom: 2px solid transparent; }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--brand-blue); }
+
+  .insight-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 22px 26px; margin-bottom: 18px; }
+  .insight-card h3 { margin: 0 0 10px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+  .insight-card h3 .tag { width: 9px; height: 9px; border-radius: 50%; background: var(--brand-blue); display: inline-block; flex-shrink: 0; }
+  .insight-card p { margin: 0 0 10px; line-height: 1.6; font-size: 15px; color: var(--ink-soft); }
+  .insight-card p:last-child { margin-bottom: 0; }
+  .insight-card .stat-strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .insight-card.alert { border-color: color-mix(in srgb, var(--cat-falta) 35%, var(--line)); }
+  .insight-card.alert h3 .tag { background: var(--cat-falta); }
+
+  .trend-row { display: flex; align-items: center; gap: 14px; margin: 14px 0; }
+  .trend-row .trend-month { width: 92px; font-size: 13px; color: var(--ink-faint); font-weight: 600; flex-shrink: 0; }
+  .trend-row .trend-track { flex: 1; height: 10px; background: var(--accent-soft); border-radius: 5px; overflow: hidden; }
+  .trend-row .trend-fill { height: 100%; border-radius: 5px; background: var(--cat-falta); }
+  .trend-row .trend-pct { width: 52px; text-align: right; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+
+  .rank-list { list-style: none; margin: 10px 0 0; padding: 0; counter-reset: rank; }
+  .rank-list li { counter-increment: rank; display: grid; grid-template-columns: 24px 1fr 90px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+  .rank-list li:last-child { border-bottom: none; }
+  .rank-list li::before { content: counter(rank); color: var(--ink-faint); font-weight: 700; font-size: 13px; }
+  .rank-list .rank-pct { text-align: right; font-weight: 700; color: var(--cat-falta); font-variant-numeric: tabular-nums; }
+
+  .reco-list { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .reco-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); }
+  .reco-list .reco-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--brand-blue); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 </style>
 </head>
 <body>
@@ -139,6 +168,12 @@
   <h1>Panorama de viajes</h1>
   <p class="subtitle">11 de septiembre – 10 de noviembre de 2026. 86.388 solicitudes de viaje en total, desglosadas por resultado. Clic en una tarjeta para ver el detalle de esa categoría.</p>
 
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-panorama" data-view="panorama">Panorama</button>
+    <button class="tab-btn" id="tab-conclusiones" data-view="conclusiones">Conclusiones</button>
+  </div>
+
+  <div id="view-panorama">
   <div class="cards" id="cards"></div>
 
   <div class="finding" id="finding"></div>
@@ -185,6 +220,60 @@
   <div class="panel">
     <h2><span class="swatch"></span>Top sedes (Caracas)</h2>
     <div id="branches"></div>
+  </div>
+  </div>
+
+  <div id="view-conclusiones" style="display:none">
+
+    <div class="insight-card">
+      <h3><span class="tag"></span>Más de la mitad de los viajes no se completan</h3>
+      <p>De las <span class="stat-strong">86.388</span> solicitudes del período, solo <span class="stat-strong">42,8%</span> termina en un viaje completado. El resto se cancela: <span class="stat-strong">37,8%</span> por el propio cliente, <span class="stat-strong">19,1%</span> por falta de asignación (timeout de ~5 min sin conductor), y un <span class="stat-strong">0,3%</span> por soporte/operaciones.</p>
+    </div>
+
+    <div class="insight-card alert">
+      <h3><span class="tag"></span>La falta de conductores va en aumento, no en descenso</h3>
+      <p>Comparando el % de solicitudes que termina en "falta de asignación" mes a mes, la tendencia es clara y va para el lado equivocado:</p>
+      <div class="trend-row"><div class="trend-month">Septiembre</div><div class="trend-track"><div class="trend-fill" style="width:17.1%"></div></div><div class="trend-pct">17,1%</div></div>
+      <div class="trend-row"><div class="trend-month">Octubre</div><div class="trend-track"><div class="trend-fill" style="width:19.5%"></div></div><div class="trend-pct">19,5%</div></div>
+      <div class="trend-row"><div class="trend-month">Nov (1-10)</div><div class="trend-track"><div class="trend-fill" style="width:21.2%"></div></div><div class="trend-pct">21,2%</div></div>
+      <p>En paralelo, la tasa de viajes completados cae: 44,9% → 42,6% → 40,0%. Es decir, el problema de oferta de conductores se está agravando, no mejorando, mientras el volumen de solicitudes crece.</p>
+    </div>
+
+    <div class="insight-card alert">
+      <h3><span class="tag"></span>Sedes con más del doble de falta de asignación que el promedio</h3>
+      <p>El promedio general de falta de asignación es <span class="stat-strong">19,2%</span> de las solicitudes (sedes con al menos 100 solicitudes en el período). Estas sedes están muy por encima:</p>
+      <ol class="rank-list">
+        <li><span>Plaza Caricuao</span><span class="rank-pct">51,3%</span></li>
+        <li><span>Caricuao</span><span class="rank-pct">44,1%</span></li>
+        <li><span>Danila</span><span class="rank-pct">42,8%</span></li>
+        <li><span>Madre Cabrini</span><span class="rank-pct">41,9%</span></li>
+        <li><span>Mónica</span><span class="rank-pct">39,9%</span></li>
+        <li><span>La Asunción</span><span class="rank-pct">38,3%</span></li>
+        <li><span>Juan Bautista</span><span class="rank-pct">36,6%</span></li>
+        <li><span>José Miguel</span><span class="rank-pct">35,8%</span></li>
+      </ol>
+      <p>José Miguel además es la sede con más volumen absoluto de falta de asignación (1.184 casos) — ahí el problema de oferta es tanto de tasa como de escala.</p>
+    </div>
+
+    <div class="insight-card">
+      <h3><span class="tag"></span>La mañana, no la noche, es el peor momento relativo para conseguir conductor</h3>
+      <p>En números absolutos la noche (18-23h) concentra más casos de falta de asignación porque ahí hay más demanda en general. Pero si se mide la <em>proporción</em> de viajes que fallan por falta de conductor dentro de cada franja (fallas ÷ [fallas + completados]), la foto cambia:</p>
+      <div class="trend-row"><div class="trend-month">Mañana (06-11h)</div><div class="trend-track"><div class="trend-fill" style="width:40.3%"></div></div><div class="trend-pct">40,3%</div></div>
+      <div class="trend-row"><div class="trend-month">Tarde (12-17h)</div><div class="trend-track"><div class="trend-fill" style="width:29.5%"></div></div><div class="trend-pct">29,5%</div></div>
+      <div class="trend-row"><div class="trend-month">Noche (18-23h)</div><div class="trend-track"><div class="trend-fill" style="width:28.2%"></div></div><div class="trend-pct">28,2%</div></div>
+      <p>En la mañana, 4 de cada 10 solicitudes que no terminan completadas fallan por no conseguir conductor — peor proporción que en la noche, aunque en volumen bruto se vea menos. Sugiere déficit de oferta matutina, no solo nocturna.</p>
+    </div>
+
+    <div class="insight-card">
+      <h3><span class="tag"></span>Recomendaciones</h3>
+      <ol class="reco-list">
+        <li><span class="reco-num">1</span>Priorizar oferta de conductores en Plaza Caricuao, Caricuao, Danila y Madre Cabrini — ahí la falta de asignación supera el 40%, más del doble del promedio.</li>
+        <li><span class="reco-num">2</span>Revisar la cobertura de conductores en horario matutino (06-11h): aunque el volumen es menor que en la noche, la proporción de fallas es la peor del día.</li>
+        <li><span class="reco-num">3</span>Investigar la fricción en "cancelado por cliente" (37,8% del total, mediana de cancelación en solo 1m 42s): parece más un problema de UX/dirección al pedir el viaje que de espera por conductor.</li>
+        <li><span class="reco-num">4</span>Monitorear la tendencia mensual de falta de asignación — viene subiendo (17,1% → 19,5% → 21,2%) y, de seguir así, se agrava en diciembre con el pico de demanda de fin de año.</li>
+      </ol>
+    </div>
+
   </div>
 
   <footer>
@@ -385,6 +474,15 @@ function resetFilter(){
   document.getElementById("f-hour-to").value = 23;
   runFilter();
 }
+
+function switchTab(view){
+  document.getElementById("view-panorama").style.display = view === "panorama" ? "" : "none";
+  document.getElementById("view-conclusiones").style.display = view === "conclusiones" ? "" : "none";
+  document.getElementById("tab-panorama").classList.toggle("active", view === "panorama");
+  document.getElementById("tab-conclusiones").classList.toggle("active", view === "conclusiones");
+}
+document.getElementById("tab-panorama").addEventListener("click", ()=>switchTab("panorama"));
+document.getElementById("tab-conclusiones").addEventListener("click", ()=>switchTab("conclusiones"));
 
 populateHourSelects();
 runFilter();
