@@ -443,6 +443,15 @@ function onStatusChange(){
 function renderCards(){
   const el = document.getElementById("cards");
   el.innerHTML = "";
+
+  const totalCard = document.createElement("div");
+  totalCard.className = "card";
+  totalCard.style.setProperty("--dot", "var(--brand-blue)");
+  totalCard.innerHTML = `<div class="label"><span class="dot"></span>Total solicitudes</div>
+    <div class="value">${fmt(TOTAL)}</div>
+    <div class="pct">100% · completadas + canceladas</div>`;
+  el.appendChild(totalCard);
+
   ORDER.forEach(key=>{
     const d = DATA[key];
     const pct = (d.total/TOTAL*100).toFixed(1).replace(".",",");
@@ -662,15 +671,22 @@ function runFilter(fs){
   if(!dateFrom || !dateTo || dateFrom > dateTo) return;
 
   if(status === "all"){
+    let sumAll = 0;
     ORDER.forEach(key=>{
       const d = DATA[key];
       const n = queryCube(key, dateFrom, dateTo, hFrom, hTo);
+      sumAll += n;
       const row = document.createElement("div");
       row.className = "filter-result";
       row.innerHTML = `<div class="fr-label"><span class="fr-dot" style="background:var(${d.dot})"></span>${d.label}</div>
         <div class="fr-value">${fmt(n)}</div>`;
       el.appendChild(row);
     });
+    const totalRow = document.createElement("div");
+    totalRow.className = "filter-result";
+    totalRow.innerHTML = `<div class="fr-label"><span class="fr-dot" style="background:var(--brand-blue)"></span>Total</div>
+      <div class="fr-value">${fmt(sumAll)}</div>`;
+    el.appendChild(totalRow);
     return;
   }
 
