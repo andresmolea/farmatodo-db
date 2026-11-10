@@ -243,14 +243,14 @@
       <h3><span class="tag"></span>Sedes con más del doble de falta de asignación que el promedio</h3>
       <p>El promedio general de falta de asignación es <span class="stat-strong">19,2%</span> de las solicitudes (sedes con al menos 100 solicitudes en el período). Estas sedes están muy por encima:</p>
       <ol class="rank-list">
-        <li><span>Plaza Caricuao</span><span class="rank-pct">51,3%</span></li>
-        <li><span>Caricuao</span><span class="rank-pct">44,1%</span></li>
-        <li><span>Danila</span><span class="rank-pct">42,8%</span></li>
-        <li><span>Madre Cabrini</span><span class="rank-pct">41,9%</span></li>
-        <li><span>Mónica</span><span class="rank-pct">39,9%</span></li>
-        <li><span>La Asunción</span><span class="rank-pct">38,3%</span></li>
-        <li><span>Juan Bautista</span><span class="rank-pct">36,6%</span></li>
-        <li><span>José Miguel</span><span class="rank-pct">35,8%</span></li>
+        <li><span>Plaza Caricuao <small style="color:var(--ink-faint); font-weight:400;">— Av Ppal de Ruiz Pineda, CC Plaza Caricuao, Caracas</small></span><span class="rank-pct">51,3%</span></li>
+        <li><span>Caricuao <small style="color:var(--ink-faint); font-weight:400;">— Bloque 11, Sector UD-7, Ruiz Pineda, Caracas</small></span><span class="rank-pct">44,1%</span></li>
+        <li><span>Danila <small style="color:var(--ink-faint); font-weight:400;">— Av Intercomunal del Valle, Calle Zea Coche, Caracas</small></span><span class="rank-pct">42,8%</span></li>
+        <li><span>Madre Cabrini <small style="color:var(--ink-faint); font-weight:400;">— Av Ppal de Antímano Nº19, Caracas</small></span><span class="rank-pct">41,9%</span></li>
+        <li><span>Mónica <small style="color:var(--ink-faint); font-weight:400;">— Carretera El Hatillo, CC Parque Cerro Verde, Caracas</small></span><span class="rank-pct">39,9%</span></li>
+        <li><span>La Asunción <small style="color:var(--ink-faint); font-weight:400;">— Av 31 de Julio, Sector Cocheima, Porlamar</small></span><span class="rank-pct">38,3%</span></li>
+        <li><span>Juan Bautista <small style="color:var(--ink-faint); font-weight:400;">— Km 2 Ctra. Petare Sta Lucía, Filas de Mariche, Caracas</small></span><span class="rank-pct">36,6%</span></li>
+        <li><span>José Miguel <small style="color:var(--ink-faint); font-weight:400;">— Ctra. La Unión vía El Hatillo, Caracas</small></span><span class="rank-pct">35,8%</span></li>
       </ol>
       <p>José Miguel además es la sede con más volumen absoluto de falta de asignación (1.184 casos) — ahí el problema de oferta es tanto de tasa como de escala.</p>
     </div>
@@ -384,13 +384,60 @@ function renderMonths(){
   barRows(el, MONTH_LABELS, d.months, d.dot);
   addTable(el, MONTH_LABELS, d.months, "Mes", "Casos");
 }
+const BRANCH_INFO = {
+  "PIEDRA LUNA": {city:"Guayana City", addr:"Av Atlántico c/Av Norte-Sur 4, Sector Las Garzas"},
+  "PASEO CARONI": {city:"Guayana City", addr:"Av Paseo Caroní c/Calle Aro, Urb Alta Vista"},
+  "VILLA GRANADA": {city:"Guayana City", addr:"Av Venezuela c/Av Estados Unidos, Urb Villa Granada"},
+  "ORO": {city:"Guayana City", addr:"Av Atlántico, Sector Los Olivos, Puerto Ordaz, Edo. Bolívar"},
+  "MATERNIDAD": {city:"Caracas", addr:"Av San Martín, frente a la Maternidad Concepción Palacios"},
+  "JOSE MIGUEL": {city:"Caracas", addr:"Ctra. La Unión vía El Hatillo, Calle La Colina, Sector El Otro Lado, Mun. El Hatillo"},
+  "NUEVA CARACAS": {city:"Caracas", addr:"Calle Colombia Nº15, al lado de la Clínica Panamericana, Catia"},
+  "ZONA FRANCA": {city:"Caracas", addr:"Av San Martín c/Callejón Anauco, Urb 9 de Diciembre"},
+  "TEPUY": {city:"Caracas", addr:"Av Río de Janeiro con Calle Monterrey, Urb Las Mercedes"},
+  "JADE": {city:"Ciudad Bolívar", addr:"Av 17 de Diciembre esq. Av La Urbina"},
+  "TEREPAIMA": {city:"Caracas", addr:"Zona Industrial La Trinidad, Calle del Arenal"},
+  "YADIRA": {city:"Valencia", addr:"Parque Industrial La Floresta, Carretera Nacional Guacara-Valencia"},
+  "ARCO": {city:"Caracas", addr:"Av Ppal del Paraíso con Calle Madariaga, Edif Centro Plaza Páez"},
+  "MONICA": {city:"Caracas", addr:"Carretera El Hatillo, Sector El Pauji, CC Parque Cerro Verde"},
+  "JUAN BAUTISTA": {city:"Caracas", addr:"Km 2 Ctra. Petare Sta Lucía, Filas de Mariche"},
+  "GRANATE": {city:"Guarenas", addr:"Av Intercomunal Guarenas-Guatire, Parcela A7, Mun. Plaza"},
+  "PLAZA CARICUAO": {city:"Caracas", addr:"Av Ppal de Ruiz Pineda, CC Plaza Caricuao, Locales 7 al 12"},
+  "CARICUAO": {city:"Caracas", addr:"Bloque 11, Sector UD-7, Edif 3 Local 54, Ruiz Pineda"},
+  "DANILA": {city:"Caracas", addr:"Av Intercomunal del Valle, Calle Zea Coche, Mun. Libertador"},
+  "MADRE CABRINI": {city:"Caracas", addr:"Av Ppal de Antímano Nº19, Local C, PB"},
+  "LA ASUNCION": {city:"Porlamar", addr:"Av 31 de Julio, Sector Cocheima"},
+  "PEDRO LUIS": {city:"Caracas", addr:"Subida de Los Naranjos, Distrito Capital"},
+};
+
 function renderBranches(){
   const d = DATA[active];
   const el = document.getElementById("branches");
-  const labels = d.branches.map(b=>b[0]);
-  const values = d.branches.map(b=>b[1]);
-  barRows(el, labels, values, d.dot);
-  addTable(el, labels, values, "Sede", "Casos");
+  const max = Math.max(...d.branches.map(b=>b[1]));
+  el.innerHTML = "";
+  d.branches.forEach(([name,v])=>{
+    const info = BRANCH_INFO[name];
+    const w = max ? (v/max*100) : 0;
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `<div class="name">${name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%; background:var(${d.dot})"></div></div>
+      <div class="num">${fmt(v)}</div>`;
+    const fill = row.querySelector(".bar-fill");
+    const tip = info ? `${name} — ${info.city}: ${info.addr} (${fmt(v)} casos)` : `${name}: ${fmt(v)}`;
+    fill.addEventListener("mousemove", e=>showTip(e, tip));
+    fill.addEventListener("mouseleave", hideTip);
+    el.appendChild(row);
+  });
+  const details = document.createElement("details");
+  details.className = "table-toggle";
+  const rows = d.branches.map(([name,v])=>{
+    const info = BRANCH_INFO[name];
+    const sub = info ? `<div style="color:var(--ink-faint); font-size:12px; font-weight:400;">${info.city} — ${info.addr}</div>` : "";
+    return `<tr><td>${name}${sub}</td><td>${fmt(v)}</td></tr>`;
+  }).join("");
+  details.innerHTML = `<summary>Ver como tabla (con dirección)</summary>
+    <table><thead><tr><th>Sede</th><th>Casos</th></tr></thead><tbody>${rows}</tbody></table>`;
+  el.appendChild(details);
 }
 
 function addTable(container, labels, values, colA, colB){
