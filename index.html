@@ -77,11 +77,11 @@
   .card .pct { font-size: 13.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 
   .panel { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 24px 26px 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin: 0 0 18px; display: flex; align-items: center; gap: 8px; }
+  .panel h2 { font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); font-weight: 700; margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
   .panel h2 .swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--dot); }
 
-  .bar-row { display: grid; grid-template-columns: 124px 1fr 68px; align-items: center; gap: 12px; padding: 8px 0; font-size: 15px; }
-  .bar-row .name { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-row { display: grid; grid-template-columns: 172px 1fr 68px; align-items: center; gap: 12px; padding: 8px 0; font-size: 15px; }
+  .bar-row .name { color: var(--ink-soft); white-space: nowrap; }
   .bar-track { background: var(--accent-soft); border-radius: 6px; height: 19px; position: relative; overflow: hidden; }
   .bar-fill { background: var(--dot); height: 100%; border-radius: 6px; transition: width .4s ease; position: relative; }
   .bar-row .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; font-size: 14px; }
@@ -172,7 +172,7 @@ const DATA = {
 
 const ORDER = ["completadas","cancel_customer","falta_asignacion","cancel_admin"];
 const DAYPART_LABELS = ["Madrugada (00-05h)","Mañana (06-11h)","Tarde (12-17h)","Noche (18-23h)"];
-const WEEKDAY_LABELS = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+const WEEKDAY_LABELS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 
 const TOTAL = ORDER.reduce((s,k)=>s+DATA[k].total,0);
 let active = "completadas";
