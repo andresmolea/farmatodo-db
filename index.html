@@ -228,19 +228,17 @@
     <div class="filter-results" id="filter-results"></div>
   </div>
 
-  <div class="grid3">
-    <div class="panel">
-      <h2><span class="swatch"></span>Por franja horaria</h2>
-      <div id="dayparts"></div>
-    </div>
-    <div class="panel">
-      <h2><span class="swatch"></span>Por día de la semana</h2>
-      <div id="weekday"></div>
-    </div>
-    <div class="panel">
-      <h2><span class="swatch"></span>Por mes</h2>
-      <div id="months"></div>
-    </div>
+  <div class="panel">
+    <h2><span class="swatch"></span>Por franja horaria</h2>
+    <div id="dayparts"></div>
+  </div>
+  <div class="panel">
+    <h2><span class="swatch"></span>Por día de la semana</h2>
+    <div id="weekday"></div>
+  </div>
+  <div class="panel">
+    <h2><span class="swatch"></span>Por mes</h2>
+    <div id="months"></div>
   </div>
 
   <div class="panel">
@@ -493,26 +491,29 @@ function renderFinding(){
   el.innerHTML = `<strong>${d.label}:</strong> ${d.note}`;
 }
 
+function mergeTimeBuckets(labels, computeFn, dateFrom, dateTo, hFrom, hTo){
+  const rows = labels.map(label=>({name:label, counts:{}, total:0}));
+  ORDER.forEach(key=>{
+    const arr = computeFn(key, dateFrom, dateTo, hFrom, hTo);
+    arr.forEach((v,i)=>{ rows[i].counts[key] = v; rows[i].total += v; });
+  });
+  return rows;
+}
+
 function renderDayparts(fs){
-  const d = DATA[active];
   const el = document.getElementById("dayparts");
-  const data = computeDayparts(active, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
-  barRows(el, DAYPART_LABELS, data, d.dot);
-  addTable(el, DAYPART_LABELS, data, "Franja", "Casos");
+  const rows = mergeTimeBuckets(DAYPART_LABELS, computeDayparts, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
+  el.innerHTML = compareTableHTML(rows, "Franja", name=>name);
 }
 function renderWeekday(fs){
-  const d = DATA[active];
   const el = document.getElementById("weekday");
-  const data = computeWeekday(active, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
-  barRows(el, WEEKDAY_LABELS, data, d.dot);
-  addTable(el, WEEKDAY_LABELS, data, "Día", "Casos");
+  const rows = mergeTimeBuckets(WEEKDAY_LABELS, computeWeekday, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
+  el.innerHTML = compareTableHTML(rows, "Día", name=>name);
 }
 function renderMonths(fs){
-  const d = DATA[active];
   const el = document.getElementById("months");
-  const data = computeMonths(active, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
-  barRows(el, MONTH_LABELS, data, d.dot);
-  addTable(el, MONTH_LABELS, data, "Mes", "Casos");
+  const rows = mergeTimeBuckets(MONTH_LABELS, computeMonths, fs.dateFrom, fs.dateTo, fs.hFrom, fs.hTo);
+  el.innerHTML = compareTableHTML(rows, "Mes", name=>name);
 }
 const BRANCH_INFO = {
   "PIEDRA LUNA": {city:"Guayana City", addr:"Av Atlántico c/Av Norte-Sur 4, Sector Las Garzas"},
